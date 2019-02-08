@@ -1,6 +1,6 @@
 # coordinates-api
-API com os métodos CRUD\n
-dependencias:\n
-\tnode.js;\n
-\tnpm install mongoose;\n
-\tnpm install express;\n
+API com os métodos CRUD
+dependencias:
+<p>node.js;<br>
+npm install mongoose;
+npm install express;</p>
