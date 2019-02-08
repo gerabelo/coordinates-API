@@ -2,6 +2,9 @@
 API com os métodos CRUD
 
 dependencias:
-  node.js
-  npm install mongoose
-  npm install express
+
+  node.js;
+  
+  npm install mongoose;
+  
+  npm install express;
