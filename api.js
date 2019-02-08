@@ -48,8 +48,12 @@ var Schema = new mongoose.Schema
 	lat: String,
 	lng: String,
 	status: String,
-	type: mongoose.Schema.Types.Mixed
+	//type: mongoose.Schema.Types.Mixed
 	//type:[String]
+	type: {
+		id: String,
+		icon: String
+	}
 	
 },{versionKey: false});
 
@@ -126,7 +130,7 @@ app.post("/coordinate", urlencodedParser, (req, res) => {
 
 /* ATENÇÃO */
 /* REMOVER ABAIXO */
-app.get('/coordinate/delete', function(req, res, next) {  
+app.get('/coordinate/delete', (req, res, next) => {  
 	// Coordinate.deleteMany({},(err) => {		
 	// 	if (err) {
 	// 		res.send(err);
