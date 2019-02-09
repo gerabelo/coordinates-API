@@ -20,7 +20,7 @@ json exemplo:
 	}
 }
 */
-
+var cors = require("cors");
 var express = require("express");
 var app = express();
 var port = 3000;
@@ -61,7 +61,7 @@ var Coordinate = mongoose.model("Coordinate", Schema);
 
 const util = require('util');
 
-
+app.use(cors());
 app.use(bodyParser.json());
 app.listen(port, () => {
 	console.log("Coordinates CRUD is listening on port " + port);
@@ -76,9 +76,11 @@ app.post("/coordinate/add", urlencodedParser, (req, res) => {
 	newCoordinate.save()
 		.then(item => {
 			//res.send(req.body.id + " saved to database.");
+			res.setHeader('Access-Control-Allow-Origin','*');
 			res.send(newCoordinate);
 		})
 		.catch(err => {
+			res.setHeader('Access-Control-Allow-Origin','*');			
 			res.status(400).send(err);
 		}); 
 });
@@ -91,14 +93,17 @@ app.post("/coordinate/update", urlencodedParser, (req, res) => {
 	{
 		console.log(updatedCoordinate);
 	}).then(item => {
+			res.setHeader('Access-Control-Allow-Origin','*');			
 			res.send(updatedCoordinate);
 		})
 		.catch(err => {
+			res.setHeader('Access-Control-Allow-Origin','*');			
 			res.status(400).send(err);
 		}); 
 });
 
 app.get("/", (req, res) => {
+	res.setHeader('Access-Control-Allow-Origin','*');
 	res.send("Coordinates CRUD by CajuIdeas");
 });
 
@@ -110,20 +115,25 @@ app.get("/coordinate", (req, res) => {
 				lista[ponto._id] = ponto;
 			});
 		if (err) {
+			res.setHeader('Access-Control-Allow-Origin','*');
 			res.send(err);
 		} else {
 			//res.json(pontos);
+			res.setHeader('Access-Control-Allow-Origin','*');
 			res.send(pontos);
 		}		
 	})
 });
 
 app.post("/coordinate", urlencodedParser, (req, res) => {
-	Coordinate.findById(req.body.id,(err,ponto) => {
+	Coordinate.findById({"_id":req.body.id},(err,ponto) => {
 		if (err) {
+			res.setHeader('Access-Control-Allow-Origin','*');
 			res.send(err);
 		} else {
-			res.json(ponto);
+			//console.log(ponto);
+			res.setHeader('Access-Control-Allow-Origin','*');
+			res.send(ponto);
 		}		
 	});
 });
@@ -140,8 +150,10 @@ app.get('/coordinate/delete', (req, res, next) => {
 	// });
 	Coordinate.deleteMany({},(err,result) => {
 		if (err) {
+			res.setHeader('Access-Control-Allow-Origin','*');
 			res.send(err);
 		} else {
+			res.setHeader('Access-Control-Allow-Origin','*');
 			res.send(result);
 		}
 	});
