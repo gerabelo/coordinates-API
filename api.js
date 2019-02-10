@@ -48,6 +48,7 @@ var Schema = new mongoose.Schema
 	lat: String,
 	lng: String,
 	status: String,
+	website: String,
 	//type: mongoose.Schema.Types.Mixed
 	//type:[String]
 	type: {
