@@ -1,16 +1,21 @@
 /*
 https://mongoosejs.com/docs/api.html
 
-npm install mongoose
-npm install express
+npm i mongoose
+npm i express
 
 mongodb database: test
+collection: coordinates
+	show collections
+	db.getCollections()
 
 json exemplo:
 {
 	"id": "xyz",
 	"description": "xyz",
 	"address": "xyz",
+	"phone": "xyz",
+	"website": "xyz",
 	"lat": "xyz",
 	"lng": "xyz",
 	"status": "xyz",
@@ -28,12 +33,12 @@ var bodyParser = require('body-parser');
 var urlencodedParser = bodyParser.urlencoded({extended: false});
 var database = "mongodb://localhost:27017/test";
 var mongoose = require("mongoose");
-var objectId = require("mongoose").ObjectID;
+//var objectId = require("mongoose").ObjectID;
 
 mongoose.Promise = global.Promise;
 mongoose.connect(database);
 
-var Schema = new mongoose.Schema
+var CoordinateSchema = new mongoose.Schema
 ({
 	// _id: {
 	// 	type: mongoose.Schema.Types.ObjectId,
@@ -49,16 +54,31 @@ var Schema = new mongoose.Schema
 	lng: String,
 	status: String,
 	website: String,
+	created_at: String,
 	//type: mongoose.Schema.Types.Mixed
 	//type:[String]
 	type: {
 		id: String,
 		icon: String
+	},
+	user: {
+		username: String,
+		short_name: String,
+		full_name: String
 	}
 	
 },{versionKey: false});
 
-var Coordinate = mongoose.model("Coordinate", Schema);
+var UserSchema = new mongoose.Schema({
+	username: String,
+	short_name: String,
+	full_name: String,
+	status: String,
+	created_at: String
+})
+
+var Coordinate = mongoose.model("Coordinate", CoordinateSchema);
+var User = mongoose.model("User", UserSchema);
 
 const util = require('util');
 
@@ -70,14 +90,11 @@ app.listen(port, () => {
 
 app.post("/coordinate/add", urlencodedParser, (req, res) => {
 	var newCoordinate = new Coordinate(req.body);
-	//console.log("body: " + util.inspect(req.body, {showHidden: false, depth: null}));
-	//console.log("newCoordinate.id "+newCoordinate.id);
-    console.log(newCoordinate);
-	//Coordinate.create(newCoordinate);		
+    console.log("[new coordinate added] \n"+newCoordinate+"\n\n");
+	//Coordinate.create(newCoordinate);	//same bellow	
 	newCoordinate.save()
 		.then(item => {
-			//res.send(req.body.id + " saved to database.");
-			res.setHeader('Access-Control-Allow-Origin','*');
+			res.setHeader('Access-Control-Allow-Origin','*'); //it line is required by CORS policy
 			res.send(newCoordinate);
 		})
 		.catch(err => {
@@ -88,11 +105,10 @@ app.post("/coordinate/add", urlencodedParser, (req, res) => {
 
 app.post("/coordinate/update", urlencodedParser, (req, res) => {
 	var updatedCoordinate = new Coordinate(req.body);
-	var id = req.body._id;
 
-	Coordinate.updateOne({"_id":id},{$set:updatedCoordinate}, (err,result) =>
+	Coordinate.updateOne({"_id":req.body._id},{$set:updatedCoordinate}, (err,result) =>
 	{
-		console.log(updatedCoordinate);
+		console.log("[coordinate updated]\n"+updatedCoordinate+"\n\n");
 	}).then(item => {
 			res.setHeader('Access-Control-Allow-Origin','*');			
 			res.send(updatedCoordinate);
