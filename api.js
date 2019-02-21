@@ -56,7 +56,6 @@ var CoordinateSchema = new mongoose.Schema
 	website: String,
 	created_at: String,
 	//type: mongoose.Schema.Types.Mixed
-	//type:[String]
 	type: {
 		id: String,
 		icon: String
@@ -90,6 +89,8 @@ app.listen(port, () => {
 
 app.post("/coordinate/add", urlencodedParser, (req, res) => {
 	var newCoordinate = new Coordinate(req.body);
+	console.log("[headers]: \n"+req.headers+"\n\n");
+	console.log("[body]: \n"+req.body+"\n\n");
     console.log("[new coordinate added] \n"+newCoordinate+"\n\n");
 	//Coordinate.create(newCoordinate);	//same bellow	
 	newCoordinate.save()
@@ -178,6 +179,15 @@ app.get('/coordinate/delete', (req, res, next) => {
 	 
 app.post('/coordinate/delete', function(req, res, next) {  
 	var id = req.body.id;  
-	Coordinate.findByIdAndRemove(id).exec();  
+	console.log('[deletion]\nid: '+id);
+	Coordinate.findByIdAndRemove(id, (err,result) => {
+		if (err) {
+			res.setHeader('Access-Control-Allow-Origin','*');
+			res.send(err);
+		} else {
+			res.setHeader('Access-Control-Allow-Origin','*');
+			res.send(result);
+		}
+	});  
 	//res.redirect('/');  
 });
