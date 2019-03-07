@@ -47,8 +47,8 @@ var UserSchema = new mongoose.Schema({
 	short_name: String,
 	full_name: String,
 	status: String,
-	dateCreated: Date,
-	lastUpdate: Date,
+	dateCreated: String,
+	lastUpdate: String,
 	email: String,
 	phone: String,
 	login: String,
@@ -63,7 +63,7 @@ const util = require('util');
 app.use(cors());
 app.use(bodyParser.json());
 app.listen(port, () => {
-	console.log("Coordinates CRUD is listening on port " + port);
+	console.log("listening on port " + port);
 });
 
 
@@ -205,15 +205,19 @@ json exemplo:
 /* USUARIOS */
 
 app.post("/user/add", urlencodedParser, (req, res) => {
-	var newUser = new User(req.body);
-	console.log("[headers]: \n"+req.headers+"\n\n");
-	console.log("[body]: \n"+req.body+"\n\n");
-	console.log("[new user added] \n"+newUser+"\n\n");
 	
+	console.log(JSON.stringify(req.body));
+	console.log("[headers]: \n"+JSON.stringify(req.headers)+"\n\n");
+	console.log("[body]: \n"+JSON.stringify(req.body)+"\n\n");
+	
+	
+	var newUser = new User(req.body.user);
+	console.log("[new user added] \n"+JSON.stringify(newUser)+"\n\n");
+
 	newUser.save()
 		.then(item => {
 			res.setHeader('Access-Control-Allow-Origin','*'); //it line is required by CORS policy
-			res.send(md5(newUser.password)); //retorna o md5 do md5 da senha texto pleno, gerado no cliente e submetido à api.
+			res.send(newUser);
 		})
 		.catch(err => {
 			res.setHeader('Access-Control-Allow-Origin','*');			
@@ -230,7 +234,7 @@ app.post("/user/update", urlencodedParser, (req, res) => {
 		console.log("[user updated]\n"+updatedUser+"\n\n");
 	}).then(item => {
 			res.setHeader('Access-Control-Allow-Origin','*');			
-			res.send(md5(updatedUser.password));
+			res.send(updatedUser);
 		})
 		.catch(err => {
 			res.setHeader('Access-Control-Allow-Origin','*');			
@@ -257,14 +261,34 @@ app.get("/user", (req, res) => {
 });
 
 app.post("/user/login", urlencodedParser, (req, res) => {
-	User.findOne({"login":req.body.login,"password":req.body.password},(err,usuario) => {
+	console.log(req.body);
+	console.log(req.body.login);
+	console.log(req.body.password);
+	
+	
+	User.findOne({"login":req.body.login,"password":md5(req.body.password)},(err,usuario) => {
 		if (err) {
 			res.setHeader('Access-Control-Allow-Origin','*');
 			//res.send(err);
 			res.send("0");
 		} else {
 			res.setHeader('Access-Control-Allow-Origin','*');
-			res.send(md5(usuario.password)); //retorna o md5 do md5.
+			// console.log("usuario: "+JSON.stringify(usuario));
+			res.send(usuario);			
+		}		
+	});
+});
+
+app.post("/user/fast", urlencodedParser, (req, res) => {	
+	User.findOne({"_id":req.body.id},(err,usuario) => {
+		if (err) {
+			res.setHeader('Access-Control-Allow-Origin','*');
+			//res.send(err);
+			res.send("0");
+		} else {
+			res.setHeader('Access-Control-Allow-Origin','*');
+			// console.log("usuario: "+JSON.stringify(usuario));
+			res.send(usuario);			
 		}		
 	});
 });
