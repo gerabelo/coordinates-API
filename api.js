@@ -217,7 +217,8 @@ app.post("/user/add", urlencodedParser, (req, res) => {
 		})
 		.catch(err => {
 			res.setHeader('Access-Control-Allow-Origin','*');			
-			res.status(400).send(err);
+			//res.status(400).send(err);
+			res.send("0");
 		}); 
 });
 
@@ -229,11 +230,12 @@ app.post("/user/update", urlencodedParser, (req, res) => {
 		console.log("[user updated]\n"+updatedUser+"\n\n");
 	}).then(item => {
 			res.setHeader('Access-Control-Allow-Origin','*');			
-			res.send(updatedUser);
+			res.send(md5(updatedUser.password));
 		})
 		.catch(err => {
 			res.setHeader('Access-Control-Allow-Origin','*');			
-			res.status(400).send(err);
+			//res.status(400).send(err);
+			res.send("0");
 		}); 
 });
 
@@ -249,7 +251,7 @@ app.get("/user", (req, res) => {
 			res.send(err);
 		} else {
 			res.setHeader('Access-Control-Allow-Origin','*');
-			res.send(pontos);
+			res.send(usuario);
 		}		
 	})
 });
