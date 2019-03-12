@@ -42,6 +42,11 @@ var CoordinateSchema = new mongoose.Schema
 	
 },{versionKey: false});
 
+var TypeSchema = new mongoose.Schema({
+    icon: String,
+    description: String
+},{versionKey: false});
+
 var UserSchema = new mongoose.Schema({
 	username: String,
 	short_name: String,
@@ -53,17 +58,24 @@ var UserSchema = new mongoose.Schema({
 	phone: String,
 	login: String,
 	password: String
-})
+},{versionKey: false});
 
 var Coordinate = mongoose.model("Coordinate", CoordinateSchema);
 var User = mongoose.model("User", UserSchema);
+var Type = mongoose.model("Type",TypeSchema);
 
 const util = require('util');
 
 app.use(cors());
 app.use(bodyParser.json());
 app.listen(port, () => {
-	console.log("listening on port " + port);
+	console.log("CiCo is listening on port " + port);
+});
+
+
+app.get("/", (req, res) => {
+	res.setHeader('Access-Control-Allow-Origin','*');
+	res.send("Welcome to CiCo! developed by CajuIdeas.");
 });
 
 
@@ -101,13 +113,8 @@ app.post("/coordinate/update", urlencodedParser, (req, res) => {
 		}); 
 });
 
-app.get("/", (req, res) => {
-	res.setHeader('Access-Control-Allow-Origin','*');
-	res.send("Coordinates CRUD by CajuIdeas");
-});
-
 app.get("/coordinate", (req, res) => {
-	//console.log("listing all.");	
+	console.log("listing all coordinates.");	
 	Coordinate.find({}, (err,pontos) => {
 		var lista = {};
 			pontos.forEach(ponto => {
@@ -255,7 +262,7 @@ app.get("/user", (req, res) => {
 			res.send(err);
 		} else {
 			res.setHeader('Access-Control-Allow-Origin','*');
-			res.send(usuario);
+			res.send("adicionado: "+usuario);
 		}		
 	})
 });
@@ -274,21 +281,7 @@ app.post("/user/login", urlencodedParser, (req, res) => {
 		} else {
 			res.setHeader('Access-Control-Allow-Origin','*');
 			// console.log("usuario: "+JSON.stringify(usuario));
-			res.send(usuario);			
-		}		
-	});
-});
-
-app.post("/user/fast", urlencodedParser, (req, res) => {	
-	User.findOne({"_id":req.body.id},(err,usuario) => {
-		if (err) {
-			res.setHeader('Access-Control-Allow-Origin','*');
-			//res.send(err);
-			res.send("0");
-		} else {
-			res.setHeader('Access-Control-Allow-Origin','*');
-			// console.log("usuario: "+JSON.stringify(usuario));
-			res.send(usuario);			
+			res.send("localizado: "+usuario);			
 		}		
 	});
 });
@@ -335,3 +328,45 @@ app.post('/user/delete', function(req, res, next) {
 }
 
 */
+
+app.get("/type", (req, res) => {
+	console.log("listing all types.");	
+	Type.find({}, (err,types) => {
+		var lista = {};
+			types.forEach(tp => {
+				lista[tp._id] = tp;
+			});
+		if (err) {
+			console.log(err);
+			res.setHeader('Access-Control-Allow-Origin','*');
+			res.send(err);
+		} else {
+			//res.json(pontos);
+			console.log(JSON.stringify(types));
+			res.setHeader('Access-Control-Allow-Origin','*');
+			res.send(types);
+		}		
+	})
+});
+
+app.post("/type/add", urlencodedParser, (req, res) => {
+	
+	console.log(JSON.stringify(req.body));
+	console.log("[headers]: \n"+JSON.stringify(req.headers)+"\n\n");
+	console.log("[body]: \n"+JSON.stringify(req.body)+"\n\n");
+	
+	
+	var newType = new Type(req.body.type);
+	console.log("[new type added] \n"+JSON.stringify(newType)+"\n\n");
+
+	newType.save()
+		.then(item => {
+			res.setHeader('Access-Control-Allow-Origin','*'); //it line is required by CORS policy
+			res.send(newType);
+		})
+		.catch(err => {
+			res.setHeader('Access-Control-Allow-Origin','*');			
+			//res.status(400).send(err);
+			res.send("0");
+		}); 
+});
