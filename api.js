@@ -7,20 +7,12 @@ var bodyParser = require('body-parser');
 var urlencodedParser = bodyParser.urlencoded({extended: false});
 var database = "mongodb://localhost:27017/test";
 var mongoose = require("mongoose");
-//var objectId = require("mongoose").ObjectID;
 
 mongoose.Promise = global.Promise;
 mongoose.connect(database);
 
 var CoordinateSchema = new mongoose.Schema
 ({
-	// _id: {
-	// 	type: mongoose.Schema.Types.ObjectId,
-	// 	index: true,
-	// 	required: true,
-	// 	auto: true,
-	//   },
-
 	description: String,
 	address: String,
 	phone: String,
@@ -29,7 +21,6 @@ var CoordinateSchema = new mongoose.Schema
 	status: String,
 	website: String,
 	created_at: String,
-	//type: mongoose.Schema.Types.Mixed
 	type: {
 		id: String,
 		icon: String
@@ -56,7 +47,7 @@ var UserSchema = new mongoose.Schema({
 	lastUpdate: String,
 	email: String,
 	phone: String,
-	login: String,
+	api_key: String,
 	password: String
 },{versionKey: false});
 
@@ -75,7 +66,7 @@ app.listen(port, () => {
 
 app.get("/", (req, res) => {
 	res.setHeader('Access-Control-Allow-Origin','*');
-	res.send("Welcome to CiCo! developed by CajuIdeas.");
+	res.send("Welcome to CiCo");
 });
 
 
@@ -85,7 +76,6 @@ app.post("/coordinate/add", urlencodedParser, (req, res) => {
 	console.log("[headers]: \n"+req.headers+"\n\n");
 	console.log("[body]: \n"+req.body+"\n\n");
     console.log("[new coordinate added] \n"+newCoordinate+"\n\n");
-	//Coordinate.create(newCoordinate);	//same bellow	
 	newCoordinate.save()
 		.then(item => {
 			res.setHeader('Access-Control-Allow-Origin','*'); //it line is required by CORS policy
@@ -126,6 +116,7 @@ app.get("/coordinate", (req, res) => {
 		} else {
 			//res.json(pontos);
 			res.setHeader('Access-Control-Allow-Origin','*');
+			console.log(JSON.stringify(pontos));
 			res.send(pontos);
 		}		
 	})
@@ -181,35 +172,7 @@ app.post('/coordinate/delete', function(req, res, next) {
 });
 
 
-
-/*
-https://mongoosejs.com/docs/api.html
-
-npm i mongoose
-npm i express
-
-mongodb database: test
-collection: coordinates
-	show collections
-	db.getCollections()
-
-json exemplo:
-{
-	"id": "xyz",
-	"description": "xyz",
-	"address": "xyz",
-	"phone": "xyz",
-	"website": "xyz",
-	"lat": "xyz",
-	"lng": "xyz",
-	"status": "xyz",
-	"type": {
-		"id": "xyz",
-		"icon": "xyz"
-	}
-}
-*/
-/* USUARIOS */
+/* SITES */
 
 app.post("/user/add", urlencodedParser, (req, res) => {
 	
@@ -262,26 +225,25 @@ app.get("/user", (req, res) => {
 			res.send(err);
 		} else {
 			res.setHeader('Access-Control-Allow-Origin','*');
-			res.send("adicionado: "+usuario);
+			res.send(usuarios);
 		}		
 	})
 });
 
-app.post("/user/login", urlencodedParser, (req, res) => {
-	console.log(req.body);
-	console.log(req.body.login);
-	console.log(req.body.password);
+app.post("/user/api_key", urlencodedParser, (req, res) => {
+	// console.log(req.body);
+	// console.log(req.body.api_key);
+	// console.log(req.body.password);	
 	
-	
-	User.findOne({"login":req.body.login,"password":md5(req.body.password)},(err,usuario) => {
+	User.findOne({"api_key":req.body.api_key,"password":md5(req.body.password)},(err,usuario) => {
 		if (err) {
 			res.setHeader('Access-Control-Allow-Origin','*');
-			//res.send(err);
+			console.log(err);
 			res.send("0");
 		} else {
 			res.setHeader('Access-Control-Allow-Origin','*');
-			// console.log("usuario: "+JSON.stringify(usuario));
-			res.send("localizado: "+usuario);			
+			console.log("usuario: "+JSON.stringify(usuario));
+			res.send(usuario);			
 		}		
 	});
 });
@@ -323,7 +285,7 @@ app.post('/user/delete', function(req, res, next) {
 	"status": "String",
 	"created_at": "date",
 	"last"
-	"login": "String",
+	"api_key": "String",
 	"password": "String"
 }
 
